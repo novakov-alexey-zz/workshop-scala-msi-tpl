@@ -1,0 +1,27 @@
+version: '2.2'
+services:
+
+  crud-service:
+    image: workshop-scala-msi:0.0.1-SNAPSHOT
+    container_name: workshop-scala-msi
+    mem_limit: 2g
+    environment:
+      APP_CONFIG_PATH: /opt/conf/application.conf
+    volumes:
+      - ./config/application.conf:/opt/conf/application.conf
+      - ./config/logback.xml:/opt/conf/logback.xml
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+
+  postgres:
+    restart: always
+    image: postgres:10.4
+    container_name: workshop-scala-msi-postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=trips
+      - POSTGRES_PASSWORD=trips
+      - POSTGRES_DB=trips
