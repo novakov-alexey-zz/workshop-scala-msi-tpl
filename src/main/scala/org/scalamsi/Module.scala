@@ -22,7 +22,8 @@ class Module[F[_]: Async: ContextShift](cfg: JdbcConfig) {
   implicit val errorHandler: HttpErrorHandler[F, UserError] = new UserHttpErrorHandler[F]()
 
   val qr = new QueryRoutes[F](service)
-  val routes: HttpRoutes[F] = Router(apiPrefix -> qr.routes)
+  val cr = new CommandRoutes[F](service)
+  val routes: HttpRoutes[F] = Router(apiPrefix -> (qr.routes <+> cr.routes))
 
   def resetDatabase(): F[Unit] =
     for {
