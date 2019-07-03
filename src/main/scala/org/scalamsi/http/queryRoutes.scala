@@ -17,6 +17,8 @@ class QueryRoutes[F[_]: Sync](service: TripServiceAlg[F])(implicit H: HttpErrorH
 
   val routes: HttpRoutes[F] = H.handle(HttpRoutes.of[F] {
     // Test: GET /api/v1/trips/ping
+    case GET -> Root / "ping" =>
+      Ok("pong")
 
     // Select one: GET /api/v1/trips/<id>
     case GET -> Root / IntVar(id) =>
