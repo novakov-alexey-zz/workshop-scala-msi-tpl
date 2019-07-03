@@ -10,12 +10,12 @@ trait CirceJsonCodecs extends CirceEntityDecoder with CirceEntityEncoder{
   implicit val vehicleEncoder: Encoder[Vehicle.Value] = Encoder.enumEncoder(Vehicle)
   implicit val vehicleDecoder: Decoder[Vehicle.Value] = Decoder.enumDecoder(Vehicle)
 
-  implicit val tripEncoder: ObjectEncoder[Trip] = ???
-  implicit val tripDecoder: Decoder[Trip] = ???
+  implicit val tripEncoder: ObjectEncoder[Trip] = deriveEncoder[Trip]
+  implicit val tripDecoder: Decoder[Trip] = deriveDecoder[Trip]
 
-  implicit val tripsEncoder: ObjectEncoder[Trips] = ???
-  implicit val tripsDecoder: Decoder[Trips] = ???
+  implicit val tripsEncoder: ObjectEncoder[Trips] = deriveEncoder[Trips]
+  implicit val tripsDecoder: Decoder[Trips] = deriveDecoder[Trips]
 
-  implicit val commandResultEncoder: ObjectEncoder[CommandResult] = ???
-  implicit val commandResultDecoder: Decoder[CommandResult] = ???
+  implicit val commandResultEncoder: ObjectEncoder[CommandResult] = deriveEncoder[CommandResult]
+  implicit val commandResultDecoder: Decoder[CommandResult] = deriveDecoder[CommandResult]
 }
