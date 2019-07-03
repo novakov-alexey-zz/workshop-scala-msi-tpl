@@ -20,16 +20,19 @@ class TripService[F[_]](repo: Repository[F])(implicit M: MonadError[F, Throwable
       )
       .getOrElse(DefaultSortField.pure[F])
 
-    M.raiseError(???)
+    for {
+      s <- sortBy
+      ts <- repo.selectAll(page.getOrElse(0), pageSize.getOrElse(10), s)
+    } yield Trips(ts)
   }
 
   override def select(id: Int): F[Option[Trip]] = repo.select(id)
 
   override def insert(trip: Trip): F[Int] =
-    ???
+    validateTrip(trip).flatMap(_ => repo.insert(trip))
 
   override def update(id: Int, trip: Trip): F[Int] =
-    ???
+    validateTrip(trip).flatMap(_ => repo.update(id, trip))
 
   private val validateTrip: Trip => F[Unit] = {
     case t @ Trip(_, _, _, _, true, None, _) =>
