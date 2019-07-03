@@ -17,7 +17,8 @@ class Module[F[_]: Async: ContextShift](cfg: JdbcConfig) {
     //TODO-Task5: remove overridden method
     override def createSchema(): F[Unit] = ().pure[F]
   }
-  var service: TripServiceAlg[F] = _
+
+  val service: TripServiceAlg[F] = new TripService[F](repo)
 
   implicit val errorHandler: HttpErrorHandler[F, UserError] = new UserHttpErrorHandler[F]()
 
