@@ -36,10 +36,11 @@ lazy val root = (project in file("."))
       testContainersPostgres,
     ),
     mainClass in Compile := Some("org.scalamsi.Main"),
+    dockerBaseImage := "openjdk:8-jre-alpine",
     Test / fork := true,
     addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.6")
   )
-  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(AshScriptPlugin)
 
 // https://tpolecat.github.io/2017/04/25/scalac-flags.html
 // https://docs.scala-lang.org/overviews/compiler-options/index.html
