@@ -32,7 +32,7 @@ class TripRepository[F[_]: Sync](xa: Transactor[F]) extends Repository[F] {
 
   //TODO: implement selectAll
   override def selectAll(page: Int, pageSize: Int, sort: String): F[Seq[Trip]] =
-    ???
+    selectAllQuery(sort).stream.drop(page * pageSize).take(pageSize).compile.to[Seq].transact(xa)
 
   override def select(id: Int): F[Option[Trip]] =
     sql"SELECT * FROM trips WHERE id = $id"
@@ -76,9 +76,9 @@ object TripRepositoryQueries {
   val updateFrag: Fragment = fr"UPDATE trips SET (" ++ Fragment.const(columnsWithComma) ++ fr") = "
 
   def selectAllQuery(sortField: String): doobie.Query0[Trip] =
-//    Fragment
-//      .const("")
-      ???
+    Fragment
+      .const(s"select * from trips order by $sortField")
+      .query
 
   def updateQuery(id: Int, trip: Trip): doobie.Update0 = {
     val valuesFrag =
@@ -86,6 +86,6 @@ object TripRepositoryQueries {
 
     val predicate = fr" WHERE id = $id"
 
-    ???
+    (updateFrag ++ valuesFrag ++ predicate).update
   }
 }
