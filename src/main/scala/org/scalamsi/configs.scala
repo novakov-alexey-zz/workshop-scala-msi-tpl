@@ -22,18 +22,18 @@ import org.scalamsi.refined._
 object refined {
   type ConnectionTimeout = Int Refined Interval.OpenClosed[W.`0`.T, W.`100000`.T]
   //TODO: implement these types
-  type MaxPoolSize = Int
-  type JdbcUrl = String
+  type MaxPoolSize = Int Refined Interval.OpenClosed[W.`1`.T, W.`100`.T]
+  type JdbcUrl = String Refined MatchesRegex[W.`"""jdbc:\\w+://\\w+:[0-9]{4,5}/\\w+"""`.T]
 }
 
 //TODO: implement JdbcConfig
 final case class JdbcConfig(
   url: JdbcUrl,
-  driver: String,
-  user: String,
-  password: String,
-  connectionTimeout: Int = 3000,
-  maximumPoolSize: Int = 100
+  driver: NonEmptyString,
+  user: NonEmptyString,
+  password: NonEmptyString,
+  connectionTimeout: ConnectionTimeout = 3000,
+  maximumPoolSize: MaxPoolSize = 100
 )
 
 final case class Server(host: NonEmptyString = "localhost", port: UserPortNumber = 8080)
