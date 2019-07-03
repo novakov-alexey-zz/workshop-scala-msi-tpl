@@ -13,14 +13,14 @@ import Module._
 class Module[F[_]: Async: ContextShift](cfg: JdbcConfig) {
   val xa = Transactor.fromDriverManager[F](cfg.driver.value, cfg.url.value, cfg.user.value, cfg.password.value)
 
-  var repo: Repository[F] = new TripRepository[F](xa)
+  val repo: Repository[F] = wire[TripRepository[F]]
 
-  val service: TripServiceAlg[F] = new TripService[F](repo)
+  val service: TripServiceAlg[F] = wire[TripService[F]]
 
-  implicit val errorHandler: HttpErrorHandler[F, UserError] = new UserHttpErrorHandler[F]()
+  implicit val errorHandler: HttpErrorHandler[F, UserError] = wire[UserHttpErrorHandler[F]]
 
-  val qr = new QueryRoutes[F](service)
-  val cr = new CommandRoutes[F](service)
+  val qr = wire[QueryRoutes[F]]
+  val cr = wire[CommandRoutes[F]]
   val routes: HttpRoutes[F] = Router(apiPrefix -> (qr.routes <+> cr.routes))
 
   def resetDatabase(): F[Unit] =
