@@ -13,7 +13,7 @@ object OptPage extends OptionalQueryParamDecoderMatcher[Int]("page")
 object OptPageSize extends OptionalQueryParamDecoderMatcher[Int]("pageSize")
 
 class QueryRoutes[F[_]: Sync](service: TripServiceAlg[F])(implicit H: HttpErrorHandler[F, UserError])
-    extends Http4sDsl[F] {
+    extends Http4sDsl[F] with CirceJsonCodecs {
 
   val routes: HttpRoutes[F] = H.handle(HttpRoutes.of[F] {
     // Test: GET /api/v1/trips/ping
@@ -22,10 +22,10 @@ class QueryRoutes[F[_]: Sync](service: TripServiceAlg[F])(implicit H: HttpErrorH
 
     // Select one: GET /api/v1/trips/<id>
     case GET -> Root / IntVar(id) =>
-      ???
+      service.select(id).flatMap(_.fold(NotFound())(Ok(_)))
 
     // Select all: GET /api/v1/trips?sort=id&page=1&pageSize=100
     case GET -> Root :? OptSort(sort) +& OptPage(page) +& OptPageSize(pageSize) =>
-      ???
+      service.selectAll(page, pageSize, sort).flatMap(Ok(_))
   })
 }
