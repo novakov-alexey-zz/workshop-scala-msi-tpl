@@ -17,14 +17,13 @@ class Task6Test
     extends WordSpec
     with Matchers
     with BeforeAndAfter
-    //TODO: add tetscontainers trait
-
+    with ForAllTestContainer
     with ResponseCheck
     with CirceJsonCodecs {
 
   implicit val cs: ContextShift[IO] = IO.contextShift(global)
 
-  //TODO: use Postgresql container with image name "postgres:10.4"
+  override val container = PostgreSQLContainer("postgres:10.4")
 
   def containerCfg(properties: Map[String, String]): Config =
     ConfigFactory.load(
@@ -34,12 +33,11 @@ class Task6Test
     )
 
   lazy val mod: Module[IO] = {
-    //TODO: use container val to get below 4 properties
     val dbProps = Map(
-      "url" -> "",
-      "user" -> "",
-      "password" -> "",
-      "driver" -> ""
+      "url" -> container.jdbcUrl,
+      "user" -> container.username,
+      "password" -> container.password,
+      "driver" -> container.driverClassName
     )
     val cfg = containerCfg(dbProps).resolve()
     val jdbc = AppConfig
