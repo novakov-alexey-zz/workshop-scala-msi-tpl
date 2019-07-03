@@ -13,10 +13,7 @@ import Module._
 class Module[F[_]: Async: ContextShift](cfg: JdbcConfig) {
   val xa = Transactor.fromDriverManager[F](cfg.driver.value, cfg.url.value, cfg.user.value, cfg.password.value)
 
-  var repo: Repository[F] = new TripRepository[F](xa){
-    //TODO-Task5: remove overridden method
-    override def createSchema(): F[Unit] = ().pure[F]
-  }
+  var repo: Repository[F] = new TripRepository[F](xa)
 
   val service: TripServiceAlg[F] = new TripService[F](repo)
 
