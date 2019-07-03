@@ -7,18 +7,19 @@ import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.middleware.Logger
 import eu.timepit.refined.auto._
-import com.typesafe.scalalogging.StrictLogging
-import scala.concurrent.ExecutionContext.Implicits.global
+import com.typesafe.scalalogging.LazyLogging
 
-object Main {
+object Main extends IOApp with LazyLogging {
 
-  lazy val (server, jdbc, _) =
+  val (server, jdbc, _) =
     AppConfig
       .load()
       .fold(e => sys.error(s"Failed to load configuration:\n${e.toList.mkString("\n")}"), identity)
 
-  implicit val timer: Timer[IO] = IO.timer(global)
-  implicit val cs: ContextShift[IO] = IO.contextShift(global)
+  logger.info(s"JDBC configuration: $jdbc")
+
+  override def run(args: List[String]): IO[ExitCode] =
+    stream[IO].compile.drain.as(ExitCode.Success)
 
   def stream[F[_]: ConcurrentEffect: ContextShift: Timer]: Stream[F, ExitCode] = {
     val module = new Module[F](jdbc)
